@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<head>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.4.0.min.js"></script>
+</head>
+<body>
+  <div  style="text-align: center;">
+    <h1>Floor 9 Quote Wall</h1>
+    <button type="button" class="btn btn-primary btn-lg" id="mode-switcher">Switch to <span id="mode">List</span> Mode</button>
+  </div>
+
+  <br>
+
+  <div id="List-mode" style="display: none;">
+    <ul class="list-group"></ul>
+  </div>
+
+  <div id="Gallery-mode">
+    <div class="jumbotron"></div>
+  </div>
+
+  <h3 style="text-align: center;">Made with love by Floor 9</h3>
+
+  <script>
+    var currentMode = 'Gallery';
+    var galleryInterval;
+    var currentQuoteInteractionIdx = 0;
+    const quoteInteractions = [[{"author":"Nicole L. Horan","text":"Why are we setting x to random shit!?"}],[{"author":"Emily","text":"It’s like a flower, but with penis"}],[{"author":"Nicole","text":"No you’re a STEM major. You’re majoring in English right?"}],[{"author":"Mateen the Dream","text":"My mom is a little Iraqi foreign woman, I love her"}],[{"author":"Anonymous","text":"Measure twice cut once? More like don’t measure at all and rip."}],[{"author":"Eli","text":"The Google earth nerds have gone underwater"}],[{"author":"Eli","text":"We should nuke the north pole"}],[{"author":"Lily","text":"For whom the pussy pops"}],[{"author":"Unknown mystery person","text":"This floor makes me happy to be alive everyday, and the two of you are a big reason why"}],[{"author":"Warren Lester","text":"But have you ever sneezed so hard that you have seen stars? Because I have."}],[{"author":"Collin","text":"Take a political side?! Why don’t I douse myself in gasoline and light a match?"}],[{"author":"Nicole","text":"I thought about cutting through the pete but then I thought ‘Momma didn’t raise no bitch!"}],[{"author":"Caroline","text":"The Honors college is funny because its filled with mega-nerds"}],[{"author":"Deirdre","text":"I’ve already lost shit and by shit I mean my mind"}],[{"author":"Eli","text":"Did you know there is an “I” in cabinet?"}],[{"author":"Deirdre","text":"This is why you can’t have guys design things, they’re incompedent"}],[{"author":"Lucas","text":"Charlie’s last name sounds like an underwater sea mussel"}],[{"author":"Charlie","text":"Your name sounds like it would be a tree species"}],[{"author":"Anonymous","text":"Im gonna bass boost this Khan Academy video"}],[{"author":"Eli","text":"alright kids, lets not use the fuck word"}],[{"author":"Eli","text":"Wait! Floor 2 is having sex on our couches?!"}],[{"author":"Stevie","text":"Every man has the right to a tiddy"}],[{"author":"Kaitlyn","text":"I don’t know what mason jars are, but my hair looks nice"}],[{"author":"Nicole L Horan","text":"You know how people get high off of drugs? I get high off calc homework at night."}],[{"author":"Lily","text":"Aren’t you the head size expert? "}],[{"author":"Dialogue"},{"text":" I’m not at my breaking point yet","author":"Caroline"},{"text":" I can push you there","author":"Warren"},{"text":" Push me off a cliff while you’re at it","author":"Caroline"}],[{"author":"Anika","text":"I think it just feels like fucking a plastic bag"}],[{"author":"Connor","text":"God, I just made myself wet."}],[{"author":"Lily","text":"They’re my parents. They’re human. They’re just as fucked up as I am."}],[{"author":"Eli ","text":"I kinda wanna dig holes"}],[{"author":"Emily","text":"What’s with the short meat and long ball? It should be long meat and short ball?"}],[{"author":"Eli","text":"Oklahoma is a Texas that hates itself."}],[{"author":"Eli","text":"Nope that’s not a cult, that’s a friendship"}],[{"author":"Connor","text":"I’m a Beatles sex god"}],[{"author":"Amelia","text":"Yeah, no I just crave chalk"}],[{"author":"Lily","text":"No! Don’t be split like my parents!"}],[{"author":"Caroline","text":"In 2019, I’m trading in my depressy for successy"}],[{"author":"Dialogue"},{"text":" What did she put on there?","author":"Unknown"},{"text":" Something called ahoy","author":"Toria"},{"text":" Toria… that’s chips ahoy… it’s a cookie","author":"Eli"}],[{"author":"Emily","text":"If I had to be my worst enemy I wouldn’t kill him, I’d turn him into a sunfish and push him over"}],[{"author":"Caroline","text":"Deirdre is the Michelin man when it comes to edge"}],[{"author":"Eli","text":"No sad, no scary, lots of lesbians"}],[{"author":"Dr. Fortney","text":"It gets really hard in the blink of an eye, so we just want blink"}],[{"author":"Caroline","text":"Damn, Charles Darwin is such a bitch"}],[{"author":"Warren","text":"As soon as you two touched feet, Mike Pence died"}],[{"author":"Eli","text":"That’s what I’m worried about when I’m on the beach… jellyfish and u boats"}],[{"author":"DT","text":"A Duke Josh(Attempting to say a jock douche)"}],[{"author":"Caroline","text":"Airborne is my crack"}],[{"author":"Warren","text":"God, Gamers are so oppressed"}],[{"author":"Anuleka Elapavaluru","text":"Hey Siri, Why is Connor like this?"}],[{"author":"Michelle","text":"I look like a brown egg head"}],[{"author":"Eli","text":"I don’t think there are consequences if you’re sneaky enough"}],[{"author":"Connor","text":"Wow, that DNA is sexy"}],[{"author":"Dr. Rampett","text":"Google almighty, the god of the westerners"}],[{"author":"DT","text":"There’s some type of water that makes everyone in NY fucking multiply"}],[{"author":"Eli","text":"I’d like to see Canada try to border-wall us. We’d tank up and blast through that shit"}],[{"author":"Eli","text":"Food shouldn’t be measured in feet"}],[{"author":"Caroline","text":"I feel the caffeine ripping through my veins"}],[{"author":"Caroline","text":"This is the most Southern conversation I’ve ever heard"}],[{"author":"Eli","text":"Doesn’t violence just get the testosterone pumping?"}],[{"author":"Anonymous","text":"Hey Beautiful, Call me 412-621-9129"}],[{"author":"Deirdre","text":"I am a whore for interior decorating"}],[{"author":"Nicole","text":"Guys are confusing. That’s why I date girls."}],[{"author":"Eli’s mom","text":"We don’t need those nerds"}],[{"author":"Dr. Broccio","text":"I’m allergic to atomic mass units"}],[{"author":"Jake","text":"My favorite organism is yeast because it helps us get this bread"}],[{"author":"Mateen","text":"Testides are the most inconvenient body part. It’s literally an organ OUTSIDE of your body. NO. Put them back in."}],[{"author":"Sydney Walker","text":"I almost overdosed on NYQUIL… I think I’ve hit a low point."}],[{"author":"Emily, Eli, Jake","text":"GONK OF THRONK"}],[{"author":"Lucas","text":"You should be a rapper"}],[{"author":"Lily","text":"Everything’s like, everything’s just fucking watermelons"}],[{"author":"Caroline","text":"SPLONCH"}],[{"author":"Lucas","text":"“Sir, do you know how wide you were going back there?”"}],[{"author":"Deirdre","text":"You gays talked about lesbians without me!"}],[{"author":"“Unknown”","text":"The right of people to chop and take trees should not be infringed"}],[{"author":"Mateen","text":"Actually, fuck the Aztecs, Hernán Cortes is my dad"}],[{"author":"Eli","text":"Do you like eating meat?"}],[{"author":"Jon Moss","text":"Don’t talk to your senior Rabbi that way."}],[{"author":"DT","text":"I’ll admit, I may not have the strength, but I have the crazy and that’s all that matters"}],[{"author":"Stevie","text":"It be like THAT"}],[{"author":"Geoffrey (sci-fi prof)","text":"If one of you gets me sick, I swear to god I will fail you"}],[{"author":"Nicole L Horan","text":"Market is a whole different level of ‘I don’t give a shit’"}],[{"author":"Eli","text":"The more you talk, the sadder I get"}],[{"author":"Lucas","text":"Deirdre, you’re a tea kettle"}],[{"author":"Kat","text":"I wish someone would look at me the way Eli looks at a sports game…."}],[{"author":"Deirdre","text":"Until all those f*ckers are down on floor 7, I’m not done"}],[{"author":"Lily","text":"Apples don’t give shits"}],[{"author":"Colin Bashline","text":"What? I can’t rock my chair back and forth without you projecting your insecurities on me?"}],[{"author":"Eli","text":"You’re so weird"}],[{"author":"Lily","text":"There shouldn’t be two of us. I don’t know why my parents decided to have two kids"}],[{"author":"Caroline","text":"That red-40 is SEEPING into my veins"}],[{"author":"Connor","text":"I’ve been hunting cockroaches since ‘89"}],[{"author":"Eli","text":"NO Emily you’re too hospitable. It makes people uncomfortable"}],[{"author":"Charlie","text":"**Don’t stop believing comes on** Sorry I’m white i have to get up and dance"}],[{"author":"Deirdre","text":"CMON Nicole. I’m a terrible person and I’m going to hell but even I know you have to go to those!"}],[{"author":"Dialogue"},{"text":" I’m melting. Someone call 911","author":"Colin"},{"text":" Colin, you are 911","author":"Deirdre"}],[{"author":"Colin","text":"I would rather die in this room than have someone crash my jeep"}],[{"author":"Emily H.","text":"I walk into this room and there’s such Violence"}],[{"author":"Deirdre","text":"Allergic to peanuts question mark?"}],[{"author":"Connor","text":"I’m just an arrogant asshole. I don’t know why you people like me"}],[{"author":"Connor","text":"Can’t we just perch?"}],[{"author":"Jon Moss","text":"See now that’s horse crap. I don’t like that"}],[{"author":"Warren","text":"Fucking candycane pain motherfucker"}]];
+
+    const getFormattedQuoteInteraction = (quoteInteractionQuotes) => {
+      var quoteInteractionText;
+      var quoteInteractionAuthor;
+      if (quoteInteractionQuotes.length === 1) {
+        quoteInteractionText = `"${quoteInteractionQuotes[0].text}"`;
+        quoteInteractionAuthor = quoteInteractionQuotes[0].author;
+      } else {
+        quoteInteractionText = quoteInteractionQuotes.slice(1, quoteInteractionQuotes.length).map((quote) => {
+          return `<p>"${quote.text.trim()}" —${quote.author}</p>`;
+        }).join('');
+        quoteInteractionAuthor = quoteInteractionQuotes[0].author;
+      }
+
+      return { quoteInteractionAuthor, quoteInteractionText };
+    };
+
+    const displayGalleryQuote = (quoteInteractionQuotes) => {
+      const { quoteInteractionAuthor, quoteInteractionText } = getFormattedQuoteInteraction(quoteInteractionQuotes);
+      $('div.jumbotron').html(`<h3>${quoteInteractionText}<br><small>—${quoteInteractionAuthor}</small></h3>`);
+    };
+
+    const playGallery = (play) => {
+      if (play && !galleryInterval) {
+        galleryInterval = setInterval(() => {
+          if (currentQuoteInteractionIdx > quoteInteractions.length) {
+          } else {
+            currentQuoteInteractionIdx++;
+          }
+
+          displayGalleryQuote(quoteInteractions[currentQuoteInteractionIdx]);
+        }, 5000);
+      } else if (galleryInterval) {
+        clearInterval(galleryInterval);
+      }
+    };
+
+    $(document).ready(() => {
+      $('button#mode-switcher').on('click', (e) => {
+        e.preventDefault();
+
+        $(`div#${currentMode}-mode`).hide();
+        $('span#mode').html(currentMode);
+
+        if (currentMode === 'List') {
+          playGallery(true);
+          currentMode = 'Gallery'
+        } else if (currentMode === 'Gallery') {
+          displayGalleryQuote(quoteInteractions[0]);
+          playGallery(false);
+          currentMode = 'List'
+        }
+
+        $(`div#${currentMode}-mode`).show();
+      });
+
+      quoteInteractions.forEach((quoteInteractionQuotes) => {
+        const { quoteInteractionAuthor, quoteInteractionText } = getFormattedQuoteInteraction(quoteInteractionQuotes);
+        $('ul.list-group').append(`<li class="list-group-item">${quoteInteractionText} —${quoteInteractionAuthor}`);
+      });
+
+      displayGalleryQuote(quoteInteractions[0]);
+      playGallery(true);
+    });
+  </script>
+</body>
