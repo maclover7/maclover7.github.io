@@ -64,6 +64,23 @@
   <hr>
 
   <script>
+const parcelLayers = [
+  {
+    addressField: 'complaint_address',
+    attributes: ['status_type_name', 'violation', 'complaint_type_name'],
+    dateField: 'violation_date',
+    domId: 'codes',
+    layerName: 'Code_Violations_V2'
+  },
+  {
+    addressField: 'Full_Address',
+    attributes: ['Description_of_Work', 'Permit_Type'],
+    dateField: 'Issue_Date',
+    domId: 'permits',
+    layerName: 'Permit_Requests'
+  }
+];
+
 document.getElementById('form').addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -84,26 +101,6 @@ document.getElementById('form').addEventListener('submit', (e) => {
     ).then(withParcel);
   }
 });
-
-const getParcelByAddress = (propNumber, propStreet, propDirection, propMuni) => {
-  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
-  const parcelQuery = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet}${propDirection ? ' ' + propDirection : ''}%') AND (MUNI = '${propMuni}')`;
-
-  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
-    .then(res => res.json())
-    .then(res => res.features)
-    .then(features => Promise.resolve(features[0]));
-};
-
-const getParcelByTaxId = (taxId, propMuni) => {
-  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
-  const parcelQuery = `(TAX_ID = '${taxId}') AND (MUNI = '${propMuni}')`;
-
-  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
-    .then(res => res.json())
-    .then(res => res.features)
-    .then(features => Promise.resolve(features[0]));
-};
 
 const displayParcel = (feature) => {
   const attributes = [
@@ -130,22 +127,25 @@ const displayParcel = (feature) => {
   infoEl.innerHTML = `<ul>${convertedAttributes.join('\n')}</ul>`;
 };
 
-const parcelLayers = [
-  {
-    addressField: 'complaint_address',
-    attributes: ['status_type_name', 'violation', 'complaint_type_name'],
-    dateField: 'violation_date',
-    domId: 'codes',
-    layerName: 'Code_Violations_V2'
-  },
-  {
-    addressField: 'Full_Address',
-    attributes: ['Description_of_Work', 'Permit_Type'],
-    dateField: 'Issue_Date',
-    domId: 'permits',
-    layerName: 'Permit_Requests'
-  }
-];
+const getParcelByAddress = (propNumber, propStreet, propDirection, propMuni) => {
+  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
+  const parcelQuery = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet}${propDirection ? ' ' + propDirection : ''}%') AND (MUNI = '${propMuni}')`;
+
+  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
+    .then(res => res.json())
+    .then(res => res.features)
+    .then(features => Promise.resolve(features[0]));
+};
+
+const getParcelByTaxId = (taxId, propMuni) => {
+  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
+  const parcelQuery = `(TAX_ID = '${taxId}') AND (MUNI = '${propMuni}')`;
+
+  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
+    .then(res => res.json())
+    .then(res => res.features)
+    .then(features => Promise.resolve(features[0]));
+};
 
 const getAndDisplayAddressFeatures = (address) => {
   parcelLayers.forEach((parcelLayer) => {
