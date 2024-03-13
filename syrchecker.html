@@ -84,22 +84,24 @@ const parcelLayers = [
 document.getElementById('form').addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const withParcel = (parcel) => {
+  let query = "AND (MUNI = 'SYRACUSE')";
+  const inputTaxId = document.getElementById('inputTaxId').value;
+
+  if (inputTaxId) {
+    query = `(TAX_ID = '${inputTaxId}') ${query}`;
+  } else {
+    const propNumber = document.getElementById('inputNumber').value;
+    const propStreet = document.getElementById('inputStreet').value.toUpperCase();
+    const propDirection = document.getElementById('inputType').value;
+
+    query = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet}${propDirection ? ' ' + propDirection : ''}%') ${query}`;
+  }
+
+  debugger;
+  getParcelByQuery(query).then(parcel => {
     displayParcel(parcel);
     getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD);
-  };
-
-  const inputTaxId = document.getElementById('inputTaxId').value;
-  if (inputTaxId) {
-    getParcelByTaxId(inputTaxId, 'SYRACUSE').then(withParcel);
-  } else {
-    getParcelByAddress(
-      document.getElementById('inputNumber').value,
-      document.getElementById('inputStreet').value.toUpperCase(),
-      document.getElementById('inputType').value,
-      'SYRACUSE'
-    ).then(withParcel);
-  }
+  });
 });
 
 const displayParcel = (feature) => {
@@ -127,21 +129,9 @@ const displayParcel = (feature) => {
   infoEl.innerHTML = `<ul>${convertedAttributes.join('\n')}</ul>`;
 };
 
-const getParcelByAddress = (propNumber, propStreet, propDirection, propMuni) => {
-  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
-  const parcelQuery = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet}${propDirection ? ' ' + propDirection : ''}%') AND (MUNI = '${propMuni}')`;
-
-  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
-    .then(res => res.json())
-    .then(res => res.features)
-    .then(features => Promise.resolve(features[0]));
-};
-
-const getParcelByTaxId = (taxId, propMuni) => {
-  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
-  const parcelQuery = `(TAX_ID = '${taxId}') AND (MUNI = '${propMuni}')`;
-
-  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
+const getParcelByQuery = (parcelQuery) => {
+  const url = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
+  return fetch(`${url}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
     .then(res => res.json())
     .then(res => res.features)
     .then(features => Promise.resolve(features[0]));
