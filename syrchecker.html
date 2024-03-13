@@ -69,8 +69,7 @@ document.getElementById('form').addEventListener('submit', (e) => {
 
   const withParcel = (parcel) => {
     displayParcel(parcel);
-    getAndDisplayCodes(parcel.attributes.PROP_ADD);
-    getAndDisplayPermits(parcel.attributes.PROP_ADD);
+    getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD);
   };
 
   const inputTaxId = document.getElementById('inputTaxId').value;
@@ -131,69 +130,53 @@ const displayParcel = (feature) => {
   infoEl.innerHTML = `<ul>${convertedAttributes.join('\n')}</ul>`;
 };
 
-const getAndDisplayCodes = (address) => {
-  const codesUrl = 'https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/Code_Violations_v2/FeatureServer/0/query';
-  fetch(`${codesUrl}?f=json&where=${encodeURIComponent("complaint_address =  '" + address + "'")}&outFields=*`)
-    .then(res => res.json())
-    .then(res => res.features)
-    .then(features => features.map(f => [
-      new Date(f.attributes.violation_date),
-      f.attributes.status_type_name,
-      f.attributes.violation,
-      f.attributes.complaint_type_name
-    ]))
-    .then(violations => violations.sort((a, b) => b[0] - a[0]))
-    .then(violations => violations.map(v => v.map(vField => `<td>${vField instanceof Date ? vField.toLocaleDateString() : vField}</td>`)))
-    .then(violations => {
-      const convertedViolations = violations.map(v => `<tr class="table-${v[1].includes('Open') ? 'warning' : 'secondary'}">${v.join('\n')}</tr>`).join('\n');
+const parcelLayers = [
+  {
+    addressField: 'complaint_address',
+    attributes: ['status_type_name', 'violation', 'complaint_type_name'],
+    dateField: 'violation_date',
+    domId: 'codes',
+    layerName: 'Code_Violations_V2'
+  },
+  {
+    addressField: 'Full_Address',
+    attributes: ['Description_of_Work', 'Permit_Type'],
+    dateField: 'Issue_Date',
+    domId: 'permits',
+    layerName: 'Permit_Requests'
+  }
+];
 
-      const tableEl = document.getElementById('codes');
-      tableEl.innerHTML = `
-      <thead>
-        <tr scope="col">
-          <th>Date</th>
-          <th>Status</th>
-          <th>Description</th>
-          <th>Category</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${convertedViolations}
-      </tbody>
-      `;
-    });
-};
+const getAndDisplayAddressFeatures = (address) => {
+  parcelLayers.forEach((parcelLayer) => {
+    const url = `https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/${parcelLayer.layerName}/FeatureServer/0/query`;
+    fetch(`${url}?f=json&where=${encodeURIComponent(parcelLayer.addressField + " = '" + address + "'")}&outFields=*`)
+      .then(res => res.json())
+      .then(res => res.features)
+      .then(features => features.map(f => [
+        new Date(f.attributes[parcelLayer.dateField]),
+        ...parcelLayer.attributes.map(a => f.attributes[a])
+      ]))
+      .then(features => features.sort((a, b) => b[0] - a[0]))
+      .then(features => features.map(f => f.map(attr => `<td>${attr instanceof Date ? attr.toLocaleDateString() : attr}</td>`)))
+      .then(features => {
+        const convertedFeatures = features.map(f => `<tr class="table-${f[1].includes('Open') ? 'warning' : 'secondary'}">${f.join('\n')}</tr>`);
 
-const getAndDisplayPermits = (address) => {
-  const permitsUrl = 'https://services6.arcgis.com/bdPqSfflsdgFRVVM/ArcGIS/rest/services/Permit_Requests/FeatureServer/0/query';
-  fetch(`${permitsUrl}?f=json&where=${encodeURIComponent("Full_Address =  '" + address + "'")}&outFields=*`)
-    .then(res => res.json())
-    .then(res => res.features)
-    .then(features => features.map(f => [
-      new Date(f.attributes.Issue_Date),
-      'Approved',
-      f.attributes.Description_of_Work,
-      f.attributes.Permit_Type
-    ]))
-    .then(violations => violations.sort((a, b) => b[0] - a[0]))
-    .then(violations => violations.map(v => v.map(vField => `<td>${vField instanceof Date ? vField.toLocaleDateString() : vField}</td>`)))
-    .then(violations => {
-      const convertedViolations = violations.map(v => `<tr class="table-secondary">${v.join('\n')}</tr>`).join('\n');
-
-      const tableEl = document.getElementById('permits');
-      tableEl.innerHTML = `
-      <thead>
-        <tr scope="col">
-          <th>Date</th>
-          <th>Status</th>
-          <th>Description</th>
-          <th>Category</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${convertedViolations}
-      </tbody>
-      `;
+        const tableEl = document.getElementById(parcelLayer.domId);
+        tableEl.innerHTML = `
+        <thead>
+          <tr scope="col">
+            <th>Date</th>
+            ${features[0].length === 4 ? '<th>Status</th>' : ''}
+            <th>Description</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${convertedFeatures.join('\n')}
+        </tbody>
+        `;
+      });
     });
 };
   </script>
