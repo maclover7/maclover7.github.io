@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<head>
+  <title>syrchecker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body class="container">
+  <h1>syrchecker</h1>
+
+  <form id="form" class="row g-3">
+    <div class="col-md-2">
+      <label for="inputNumber" class="form-label">Number</label>
+      <input type="text" class="form-control" id="inputNumber">
+    </div>
+
+    <div class="col-md-2">
+      <label for="inputStreet" class="form-label">Street</label>
+      <input type="text" class="form-control" id="inputStreet">
+    </div>
+
+    <div class="col-md-2">
+      <label for="inputType" class="form-label">Type</label>
+      <select id="inputType" class="form-select">
+        <option selected></option>
+        <option>ST</option>
+        <option>AVE</option>
+        <option>BLVD</option>
+        <option>PL</option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label for="inputDirection" class="form-label">Direction</label>
+      <select id="inputDirection" class="form-select">
+        <option selected></option>
+        <option>N</option>
+        <option>S</option>
+        <option>E</option>
+        <option>W</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="inputTaxId" class="form-label">Tax ID</label>
+      <input type="text" class="form-control" id="inputTaxId">
+    </div>
+
+    <div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+  <hr>
+
+  <h3>Property info</h3>
+  <div id="info"></div>
+  <hr>
+
+  <h3>Code violations</h3>
+  <table id="codes" class="table"></table>
+  <hr>
+
+  <h3>Permits</h3>
+  <table id="permits" class="table"></table>
+  <hr>
+
+  <script>
+document.getElementById('form').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const withParcel = (parcel) => {
+    displayParcel(parcel);
+    getAndDisplayCodes(parcel.attributes.PROP_ADD);
+    getAndDisplayPermits(parcel.attributes.PROP_ADD);
+  };
+
+  const inputTaxId = document.getElementById('inputTaxId').value;
+  if (inputTaxId) {
+    getParcelByTaxId(inputTaxId, 'SYRACUSE').then(withParcel);
+  } else {
+    getParcelByAddress(
+      document.getElementById('inputNumber').value,
+      document.getElementById('inputStreet').value.toUpperCase(),
+      document.getElementById('inputType').value,
+      'SYRACUSE'
+    ).then(withParcel);
+  }
+});
+
+const getParcelByAddress = (propNumber, propStreet, propDirection, propMuni) => {
+  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
+  const parcelQuery = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet}${propDirection ? ' ' + propDirection : ''}%') AND (MUNI = '${propMuni}')`;
+
+  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
+    .then(res => res.json())
+    .then(res => res.features)
+    .then(features => Promise.resolve(features[0]));
+};
+
+const getParcelByTaxId = (taxId, propMuni) => {
+  const parcelsUrl = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
+  const parcelQuery = `(TAX_ID = '${taxId}') AND (MUNI = '${propMuni}')`;
+
+  return fetch(`${parcelsUrl}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
+    .then(res => res.json())
+    .then(res => res.features)
+    .then(features => Promise.resolve(features[0]));
+};
+
+const displayParcel = (feature) => {
+  const attributes = [
+    feature.attributes.PROP_ADD,
+    feature.attributes.OWNER_NAME,
+    [
+      feature.attributes.STREET,
+      feature.attributes.CITY_STATE,
+      feature.attributes.OWNER_ZIP,
+    ].join(' '),
+    feature.attributes.TAX_ID,
+    feature.attributes.USE,
+    feature.attributes.ACRES,
+    feature.attributes.WARD
+  ];
+
+  const attributeHeaders = ['Address', 'Owner', 'Owner address', 'Tax ID', 'Use', 'Acres', 'Ward'];
+  const convertedAttributes = [
+    `<li><a target="_blank" href="https://ocfintax.ongov.net/Imate/propdetail.aspx?swis=311500&printkey=${feature.attributes.TAX_ID}">County tax portal</a>`,
+    ...attributes.map((attr, idx) => `<li><b>${attributeHeaders[idx]}:</b> ${attr}</li>`)
+  ];
+
+  const infoEl = document.getElementById('info');
+  infoEl.innerHTML = `<ul>${convertedAttributes.join('\n')}</ul>`;
+};
+
+const getAndDisplayCodes = (address) => {
+  const codesUrl = 'https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/Code_Violations_v2/FeatureServer/0/query';
+  fetch(`${codesUrl}?f=json&where=${encodeURIComponent("complaint_address =  '" + address + "'")}&outFields=*`)
+    .then(res => res.json())
+    .then(res => res.features)
+    .then(features => features.map(f => [
+      new Date(f.attributes.violation_date),
+      f.attributes.status_type_name,
+      f.attributes.violation,
+      f.attributes.complaint_type_name
+    ]))
+    .then(violations => violations.sort((a, b) => b[0] - a[0]))
+    .then(violations => violations.map(v => v.map(vField => `<td>${vField instanceof Date ? vField.toLocaleDateString() : vField}</td>`)))
+    .then(violations => {
+      const convertedViolations = violations.map(v => `<tr class="table-${v[1].includes('Open') ? 'warning' : 'secondary'}">${v.join('\n')}</tr>`).join('\n');
+
+      const tableEl = document.getElementById('codes');
+      tableEl.innerHTML = `
+      <thead>
+        <tr scope="col">
+          <th>Date</th>
+          <th>Status</th>
+          <th>Description</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${convertedViolations}
+      </tbody>
+      `;
+    });
+};
+
+const getAndDisplayPermits = (address) => {
+  const permitsUrl = 'https://services6.arcgis.com/bdPqSfflsdgFRVVM/ArcGIS/rest/services/Permit_Requests/FeatureServer/0/query';
+  fetch(`${permitsUrl}?f=json&where=${encodeURIComponent("Full_Address =  '" + address + "'")}&outFields=*`)
+    .then(res => res.json())
+    .then(res => res.features)
+    .then(features => features.map(f => [
+      new Date(f.attributes.Issue_Date),
+      'Approved',
+      f.attributes.Description_of_Work,
+      f.attributes.Permit_Type
+    ]))
+    .then(violations => violations.sort((a, b) => b[0] - a[0]))
+    .then(violations => violations.map(v => v.map(vField => `<td>${vField instanceof Date ? vField.toLocaleDateString() : vField}</td>`)))
+    .then(violations => {
+      const convertedViolations = violations.map(v => `<tr class="table-secondary">${v.join('\n')}</tr>`).join('\n');
+
+      const tableEl = document.getElementById('permits');
+      tableEl.innerHTML = `
+      <thead>
+        <tr scope="col">
+          <th>Date</th>
+          <th>Status</th>
+          <th>Description</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${convertedViolations}
+      </tbody>
+      `;
+    });
+};
+  </script>
+</body>
