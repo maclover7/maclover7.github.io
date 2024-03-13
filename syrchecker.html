@@ -92,12 +92,12 @@ document.getElementById('form').addEventListener('submit', (e) => {
   } else {
     const propNumber = document.getElementById('inputNumber').value;
     const propStreet = document.getElementById('inputStreet').value.toUpperCase();
-    const propDirection = document.getElementById('inputType').value;
+    const propType = document.getElementById('inputType').value;
+    const propDirection = document.getElementById('inputDirection').value;
 
-    query = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet}${propDirection ? ' ' + propDirection : ''}%') ${query}`;
+    query = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet} ${propType}${propDirection ? ' ' + propDirection : ''}%') ${query}`;
   }
 
-  debugger;
   getParcelByQuery(query).then(parcel => {
     displayParcel(parcel);
     getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD);
