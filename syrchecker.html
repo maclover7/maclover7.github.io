@@ -83,6 +83,9 @@ const parcelLayers = [
 
 document.getElementById('form').addEventListener('submit', (e) => {
   e.preventDefault();
+  document.getElementById('info').innerHTML = '';
+  document.getElementById('codes').innerHTML = '';
+  document.getElementById('permits').innerHTML = '';
 
   let query = "AND (MUNI = 'SYRACUSE')";
   const inputTaxId = document.getElementById('inputTaxId').value;
