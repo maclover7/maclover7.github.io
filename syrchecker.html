@@ -98,13 +98,13 @@ document.getElementById('form').addEventListener('submit', (e) => {
     query = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet} ${propType}${propDirection ? ' ' + propDirection : ''}%') ${query}`;
   }
 
-  getParcelByQuery(query).then(parcel => {
-    displayParcel(parcel);
+  getParcelByQuery(query).then(([ parcel ]) => {
+    getSharedOwnerParcels(parcel).then((parcels) => displayParcel(parcel, parcels));
     getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD);
   });
 });
 
-const displayParcel = (feature) => {
+const displayParcel = (feature, sharedOwnerParcels) => {
   const attributes = [
     feature.attributes.PROP_ADD,
     feature.attributes.OWNER_NAME,
@@ -125,16 +125,36 @@ const displayParcel = (feature) => {
     ...attributes.map((attr, idx) => `<li><b>${attributeHeaders[idx]}:</b> ${attr}</li>`)
   ];
 
+  const convertedSharedOwnerParcels = [
+    `<li><b>Other parcels with same owner address:</b> ${sharedOwnerParcels.length}<ul>`,
+    ...sharedOwnerParcels.map((parcelFeature) => {
+      const convertedParcel = [
+        parcelFeature.attributes.PROP_ADD,
+        parcelFeature.attributes.MUNI,
+        parcelFeature.attributes.USE,
+        `<a target="_blank" href="https://ocfintax.ongov.net/Imate/propdetail.aspx?swis=${parcelFeature.attributes.SWIS_CODE}&printkey=${parcelFeature.attributes.TAX_ID}">${parcelFeature.attributes.TAX_ID}</a>`
+      ].join('; ');
+
+      return `<li>${convertedParcel}</li>`;
+    }),
+    '</ul></li>'
+  ];
+
   const infoEl = document.getElementById('info');
-  infoEl.innerHTML = `<ul>${convertedAttributes.join('\n')}</ul>`;
+  infoEl.innerHTML = `<ul>${[...convertedAttributes, ...convertedSharedOwnerParcels].join('\n')}</ul>`;
 };
 
 const getParcelByQuery = (parcelQuery) => {
   const url = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
   return fetch(`${url}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
     .then(res => res.json())
-    .then(res => res.features)
-    .then(features => Promise.resolve(features[0]));
+    .then(res => res.features);
+};
+
+const getSharedOwnerParcels = (parcel) => {
+  let query = ['STREET', 'CITY_STATE', 'OWNER_ZIP'].map(p => `(${p} = '${parcel.attributes[p]}')`).join(' AND ');
+  query += ` AND (TAX_ID NOT IN ('${parcel.attributes.TAX_ID}'))`;
+  return getParcelByQuery(query);
 };
 
 const getAndDisplayAddressFeatures = (address) => {
