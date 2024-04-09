@@ -200,7 +200,7 @@ const getAndDisplayAddressFeatures = (address) => {
         <thead>
           <tr scope="col">
             <th>Date</th>
-            ${features[0].length === 4 ? '<th>Status</th>' : ''}
+            ${features.length > 0 && features[0].length === 4 ? '<th>Status</th>' : ''}
             <th>Description</th>
             <th>Category</th>
           </tr>
