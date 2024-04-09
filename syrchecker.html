@@ -55,7 +55,7 @@
   <div id="info"></div>
   <hr>
 
-  <h3>Code violations</h3>
+  <h3>Code violations <span id="codes-summary"></span></h3>
   <table id="codes" class="table"></table>
   <hr>
 
@@ -70,14 +70,21 @@ const parcelLayers = [
     attributes: ['status_type_name', 'violation', 'complaint_type_name'],
     dateField: 'violation_date',
     domId: 'codes',
-    layerName: 'Code_Violations_V2'
+    layerName: 'Code_Violations_V2',
+    summarizeFeatures: (features) => {
+      const openLen = features.filter(f => f[1].includes('Open')).length;
+
+      document.getElementById('codes-summary').innerHTML = `(${openLen} open, ${features.length} total)`;
+      return features;
+    },
   },
   {
     addressField: 'Full_Address',
     attributes: ['Description_of_Work', 'Permit_Type'],
     dateField: 'Issue_Date',
     domId: 'permits',
-    layerName: 'Permit_Requests'
+    layerName: 'Permit_Requests',
+    summarizeFeatures: (features) => features
   }
 ];
 
@@ -172,6 +179,7 @@ const getAndDisplayAddressFeatures = (address) => {
       ]))
       .then(features => features.sort((a, b) => b[0] - a[0]))
       .then(features => features.map(f => f.map(attr => `<td>${attr instanceof Date ? attr.toLocaleDateString() : attr}</td>`)))
+      .then(features => parcelLayer.summarizeFeatures(features))
       .then(features => {
         const convertedFeatures = features.map(f => `<tr class="table-${f[1].includes('Open') ? 'warning' : 'secondary'}">${f.join('\n')}</tr>`);
 
