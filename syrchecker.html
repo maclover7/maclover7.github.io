@@ -56,11 +56,11 @@
   <div id="info"></div>
   <hr>
 
-  <h3>Code violations <span id="codes-summary"></span></h3>
+  <h3>Code violations in last five years <span id="codes-summary"></span></h3>
   <table id="codes" class="table"></table>
   <hr>
 
-  <h3>Permits</h3>
+  <h3>Permits in last five years</h3>
   <table id="permits" class="table"></table>
   <hr>
 
@@ -70,6 +70,7 @@ const parcelLayers = [
     addressField: 'complaint_address',
     attributes: ['status_type_name', 'violation', 'complaint_type_name'],
     dateField: 'violation_date',
+    dateFieldmmddYYYY: true,
     domId: 'codes',
     layerName: 'Code_Violations_V2',
     summarizeFeatures: (features) => {
@@ -83,6 +84,7 @@ const parcelLayers = [
     addressField: 'Full_Address',
     attributes: ['Description_of_Work', 'Permit_Type'],
     dateField: 'Issue_Date',
+    dateFieldmmddYYYY: false,
     domId: 'permits',
     layerName: 'Permit_Requests',
     summarizeFeatures: (features) => features
@@ -173,9 +175,11 @@ const getAndDisplayAddressFeatures = (address) => {
 
   parcelLayers.forEach((parcelLayer) => {
     const url = `https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/${parcelLayer.layerName}/FeatureServer/0/query`;
+
+    const dateFiveYearsAgo = parcelLayer.dateFieldmmddYYYY ? `'1/1/${fiveYearsAgo}'` : `'${fiveYearsAgo}-01-01'`;
     const urlWhere = [
       encodeURIComponent(parcelLayer.addressField + " = '" + address + "'"),
-      encodeURIComponent(parcelLayer.dateField + " >= '1/1/" + fiveYearsAgo + "'")
+      encodeURIComponent(parcelLayer.dateField + " >= " + dateFiveYearsAgo)
     ].map(s => `(${s})`).join(' AND ');
 
     fetch(`${url}?f=json&where=${urlWhere}&outFields=*`)
