@@ -169,9 +169,16 @@ const getSharedOwnerParcels = (parcel) => {
 };
 
 const getAndDisplayAddressFeatures = (address) => {
+  const fiveYearsAgo = (new Date()).getFullYear() - 5;
+
   parcelLayers.forEach((parcelLayer) => {
     const url = `https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/${parcelLayer.layerName}/FeatureServer/0/query`;
-    fetch(`${url}?f=json&where=${encodeURIComponent(parcelLayer.addressField + " = '" + address + "'")}&outFields=*`)
+    const urlWhere = [
+      encodeURIComponent(parcelLayer.addressField + " = '" + address + "'"),
+      encodeURIComponent(parcelLayer.dateField + " >= '1/1/" + fiveYearsAgo + "'")
+    ].map(s => `(${s})`).join(' AND ');
+
+    fetch(`${url}?f=json&where=${urlWhere}&outFields=*`)
       .then(res => res.json())
       .then(res => res.features)
       .then(features => features.map(f => [
