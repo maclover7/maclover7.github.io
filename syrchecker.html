@@ -108,7 +108,7 @@ document.getElementById('form').addEventListener('submit', (e) => {
     const propType = document.getElementById('inputType').value;
     const propDirection = document.getElementById('inputDirection').value;
 
-    query = `(ADDNUM LIKE '${propNumber}%') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet} ${propType}${propDirection ? ' ' + propDirection : ''}%') ${query}`;
+    query = `(ADDNUM LIKE '${propNumber}') AND (UPPER(ADDRESSNAM) LIKE '%${propStreet} ${propType}${propDirection ? ' ' + propDirection : ''}%') ${query}`;
   }
 
   getParcelByQuery(query).then(([ parcel ]) => {
