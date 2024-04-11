@@ -134,7 +134,7 @@ const displayParcel = (feature, sharedOwnerParcels) => {
 
   const attributeHeaders = ['Address', 'Owner', 'Owner address', 'Tax ID', 'Use', 'Acres', 'Ward'];
   const convertedAttributes = [
-    `<li><a target="_blank" href="https://ocfintax.ongov.net/Imate/propdetail.aspx?swis=311500&printkey=${feature.attributes.TAX_ID}">County tax portal</a>`,
+    `<li><a target="_blank" href="https://ocfintax.ongov.net/Imate/propdetail.aspx?swis=311500&printkey=${feature.attributes.TAX_ID.replace('311500', '')}">County tax portal</a>`,
     ...attributes.map((attr, idx) => `<li><b>${attributeHeaders[idx]}:</b> ${attr}</li>`)
   ];
 
@@ -145,7 +145,7 @@ const displayParcel = (feature, sharedOwnerParcels) => {
         parcelFeature.attributes.PROP_ADD,
         parcelFeature.attributes.MUNI,
         parcelFeature.attributes.USE,
-        `<a target="_blank" href="https://ocfintax.ongov.net/Imate/propdetail.aspx?swis=${parcelFeature.attributes.SWIS_CODE}&printkey=${parcelFeature.attributes.TAX_ID}">${parcelFeature.attributes.TAX_ID}</a>`
+        `<a target="_blank" href="https://ocfintax.ongov.net/Imate/propdetail.aspx?swis=${parcelFeature.attributes.SWIS_CODE}&printkey=${parcelFeature.attributes.TAX_ID.replace(parcelFeature.attributes.SWIS_CODE, '')}">${parcelFeature.attributes.TAX_ID}</a>`
       ].join('; ');
 
       return `<li>${convertedParcel}</li>`;
