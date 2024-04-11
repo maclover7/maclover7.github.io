@@ -113,7 +113,7 @@ document.getElementById('form').addEventListener('submit', (e) => {
 
   getParcelByQuery(query).then(([ parcel ]) => {
     getSharedOwnerParcels(parcel).then((parcels) => displayParcel(parcel, parcels));
-    getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD);
+    getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD.replace('  ', ' '));
   });
 });
 
