@@ -180,7 +180,7 @@ const getAndDisplayAddressFeatures = (address) => {
 
     const dateFiveYearsAgo = parcelLayer.dateFieldmmddYYYY ? `'1/1/${fiveYearsAgo}'` : `'${fiveYearsAgo}-01-01'`;
     const urlWhere = [
-      encodeURIComponent(parcelLayer.addressField + " = '" + address + "'"),
+      encodeURIComponent(parcelLayer.addressField + " IN ('" + address + "')"),
       encodeURIComponent(parcelLayer.dateField + " >= " + dateFiveYearsAgo)
     ].map(s => `(${s})`).join(' AND ');
 
