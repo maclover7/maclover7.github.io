@@ -112,6 +112,8 @@ document.getElementById('form').addEventListener('submit', (e) => {
   }
 
   getParcelByQuery(query).then(([ parcel ]) => {
+    if (!parcel) return alert('Error: Could not find matching parcel');
+
     getSharedOwnerParcels(parcel).then((parcels) => displayParcel(parcel, parcels));
     getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD.replace('  ', ' '));
   });
