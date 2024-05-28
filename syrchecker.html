@@ -75,7 +75,6 @@ const parcelLayers = [
     layerName: 'Code_Violations_V2',
     summarizeFeatures: (features) => {
       const openLen = features.filter(f => f[1].includes('Open')).length;
-
       document.getElementById('codes-summary').innerHTML = `(${openLen} open, ${features.length} total)`;
       return features;
     },
@@ -93,9 +92,7 @@ const parcelLayers = [
 
 document.getElementById('form').addEventListener('submit', (e) => {
   e.preventDefault();
-  document.getElementById('info').innerHTML = '';
-  document.getElementById('codes').innerHTML = '';
-  document.getElementById('permits').innerHTML = '';
+  ['info', 'codes', 'permits'].forEach(id => document.getElementById(id).innerHTML = '');
 
   let query = "AND (MUNI = 'SYRACUSE')";
   const inputTaxId = document.getElementById('inputTaxId').value;
