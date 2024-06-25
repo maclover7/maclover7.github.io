@@ -56,6 +56,10 @@
   <div id="info"></div>
   <hr>
 
+  <h3>Rental registry</h3>
+  <table id="rental-registry" class="table"></table>
+  <hr>
+
   <h3>Code violations in last five years <span id="codes-summary"></span></h3>
   <table id="codes" class="table"></table>
   <hr>
@@ -67,8 +71,18 @@
   <script>
 const parcelLayers = [
   {
+    addressField: 'PropertyAddress',
+    attributes: ['NeedsRR', 'RRisValid', 'RR_contact_name'],
+    attributesNames: ['Date', 'Needs to register', 'Valid registration', 'Landlord name'],
+    domId: 'rental-registry',
+    dateField: 'inspect_period',
+    layerName: 'Syracuse_Rental_Registry',
+    summarizeFeatures: (features) => features
+  },
+  {
     addressField: 'complaint_address',
     attributes: ['status_type_name', 'violation', 'complaint_type_name'],
+    attributesNames: ['Date', 'Status', 'Description', 'Category'],
     dateField: 'violation_date',
     dateFieldmmddYYYY: true,
     domId: 'codes',
@@ -82,6 +96,7 @@ const parcelLayers = [
   {
     addressField: 'Full_Address',
     attributes: ['Description_of_Work', 'Permit_Type'],
+    attributesNames: ['Date', 'Status', 'Description', 'Category'],
     dateField: 'Issue_Date',
     dateFieldmmddYYYY: false,
     domId: 'permits',
@@ -192,16 +207,13 @@ const getAndDisplayAddressFeatures = (address) => {
       .then(features => features.map(f => f.map(attr => `<td>${attr instanceof Date ? attr.toLocaleDateString() : attr}</td>`)))
       .then(features => parcelLayer.summarizeFeatures(features))
       .then(features => {
-        const convertedFeatures = features.map(f => `<tr class="table-${f[1].includes('Open') ? 'warning' : 'secondary'}">${f.join('\n')}</tr>`);
+        const convertedFeatures = features.map(f => `<tr class="table-${(f[1].includes('Open') || f[2].includes('No')) ? 'warning' : 'secondary'}">${f.join('\n')}</tr>`);
 
         const tableEl = document.getElementById(parcelLayer.domId);
         tableEl.innerHTML = `
         <thead>
           <tr scope="col">
-            <th>Date</th>
-            ${features.length > 0 && features[0].length === 4 ? '<th>Status</th>' : ''}
-            <th>Description</th>
-            <th>Category</th>
+            ${parcelLayer.attributesNames.map(a => '<th>' + a + '</th>').join('')}
           </tr>
         </thead>
         <tbody>
