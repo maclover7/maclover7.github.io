@@ -207,7 +207,7 @@ const getAndDisplayAddressFeatures = (address) => {
       .then(features => features.map(f => f.map(attr => `<td>${attr instanceof Date ? attr.toLocaleDateString() : attr}</td>`)))
       .then(features => parcelLayer.summarizeFeatures(features))
       .then(features => {
-        const convertedFeatures = features.map(f => `<tr class="table-${(f[1].includes('Open') || f[2].includes('No')) ? 'warning' : 'secondary'}">${f.join('\n')}</tr>`);
+        const convertedFeatures = features.map(f => `<tr class="table-${(f[1].includes('Open') || f[2].includes('No')) ? 'warning' : 'success'}">${f.join('\n')}</tr>`);
 
         const tableEl = document.getElementById(parcelLayer.domId);
         tableEl.innerHTML = `
