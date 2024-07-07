@@ -128,6 +128,9 @@ document.getElementById('form').addEventListener('submit', (e) => {
 
     getSharedOwnerParcels(parcel).then((parcels) => displayParcel(parcel, parcels));
     getAndDisplayAddressFeatures(parcel.attributes.PROP_ADD.replace('  ', ' '));
+  })
+  .catch((e) => {
+    if (e.name === 'AbortError') return alert('Error: Could not connect to county GIS services');
   });
 });
 
@@ -173,7 +176,7 @@ const displayParcel = (feature, sharedOwnerParcels) => {
 
 const getParcelByQuery = (parcelQuery) => {
   const url = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
-  return fetch(`${url}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`)
+  return fetch(`${url}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`, { signal: AbortSignal.timeout(5000) })
     .then(res => res.json())
     .then(res => res.features);
 };
