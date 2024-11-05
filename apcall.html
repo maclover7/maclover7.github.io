@@ -24,22 +24,23 @@
 
   <script>
   // ** CHANGE THIS ** //
-  const raceDate = '2022-11-08'; //'2023-05-16';
+  const raceDate = '2024-11-05'; //'2023-05-16';
   const raceConfigs = [
-    { id: 'NY-G-S-2022-11-08', name: 'Gillibrand' },
-    { id: 'NY-G-H-22-2022-11-08', name: 'Mannion/Williams' },
-    { id: 'NY-G-H-24-2022-11-08', name: 'Tenney' },
-    { id: 'NY-G-SS-48-2022-11-08', name: 'May/Slater' },
-    { id: 'NY-G-SS-50-2022-11-08', name: 'Ryan/Paro' },
-    { id: 'NY-G-SH-126-2022-11-08', name: 'Lemondes/Phillips' },
-    { id: 'NY-G-SH-127-2022-11-08', name: 'Stirpe/Kelly' },
-    { id: 'NY-G-SH-128-2022-11-08', name: 'Hunter/Ciciarelli' },
-    { id: 'NY-G-SH-129-2022-11-08', name: 'Magnarelli' },
+    { id: 'NY-I-83165-NY-2024-11-05', name: 'Prop One' },
+    { id: 'NY-G-S-2024-11-05', name: 'Gillibrand' },
+    { id: 'NY-G-H-22-2024-11-05', name: 'Mannion/Williams' },
+    { id: 'NY-G-H-24-2024-11-05', name: 'Tenney' },
+    { id: 'NY-G-SS-48-2024-11-05', name: 'May/Slater' },
+    { id: 'NY-G-SS-50-2024-11-05', name: 'Ryan/Paro' },
+    { id: 'NY-G-SH-126-2024-11-05', name: 'Lemondes/Phillips' },
+    { id: 'NY-G-SH-127-2024-11-05', name: 'Stirpe/Kelly' },
+    { id: 'NY-G-SH-128-2024-11-05', name: 'Hunter/Ciciarelli' },
+    { id: 'NY-G-SH-129-2024-11-05', name: 'Magnarelli' },
     // 'PA-D-chief_executive-allegheny-2023-05-16'
   ];
   // ** ** //
 
-  fetch(`https://static01.nyt.com/elections-assets/2022/data/${raceDate}/results-new-york.json`)
+  fetch(`https://static01.nyt.com/elections-assets/pages/data/${raceDate}/results-new-york.json`)
     .then((r) => r.json())
     .then((r) => {
       raceConfigs.forEach((raceConfig) => {
@@ -55,7 +56,7 @@
           ${table.innerHTML}
           <tr>
             <td>${race.office} ${race.seat_number ? race.seat_number : ''} (${raceConfig.name})</td>
-            <td>${race.top_reporting_unit.eevp ? race.top_reporting_unit.eevp : ''}</td>
+            <td>${race.top_reporting_unit.eevp === null ? 'n/a' : race.top_reporting_unit.eevp}</td>
             <td>${winnerText}</td>
             <td>${race.outcome.winner_accepted_at.length > 0 ? new Date(race.outcome.winner_accepted_at[0]).toLocaleString() : ''}</td>
           </tr>`;
