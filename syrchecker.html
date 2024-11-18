@@ -182,7 +182,7 @@ const getParcelByQuery = (parcelQuery) => {
 };
 
 const getSharedOwnerParcels = (parcel) => {
-  let query = ['STREET', 'CITY_STATE', 'OWNER_ZIP'].map(p => `(${p} = '${parcel.attributes[p]}')`).join(' AND ');
+  let query = ['STREET', 'CITY_STATE', 'OWNER_ZIP'].map(p => `(${p} = '${parcel.attributes[p].replace("'", "''")}')`).join(' AND ');
   query += ` AND (TAX_ID NOT IN ('${parcel.attributes.TAX_ID}'))`;
   return getParcelByQuery(query);
 };
