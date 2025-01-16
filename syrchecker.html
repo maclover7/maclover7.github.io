@@ -60,6 +60,10 @@
   <table id="rental-registry" class="table"></table>
   <hr>
 
+  <h3>Vacant property registry</h3>
+  <table id="vacant-property-registry" class="table"></table>
+  <hr>
+
   <h3>Code violations in last five years <span id="codes-summary"></span></h3>
   <table id="codes" class="table"></table>
   <hr>
@@ -74,9 +78,18 @@ const parcelLayers = [
     addressField: 'PropertyAddress',
     attributes: ['NeedsRR', 'RRisValid', 'RR_contact_name'],
     attributesNames: ['Date', 'Needs to register', 'Valid registration', 'Landlord name'],
-    domId: 'rental-registry',
     dateField: 'inspect_period',
+    domId: 'rental-registry',
     layerName: 'Syracuse_Rental_Registry',
+    summarizeFeatures: (features) => features
+  },
+  {
+    addressField: 'PropertyAddress',
+    attributes: ['Vacant', 'VPR_valid', 'Owner', 'OwnerAddress'],
+    attributesNames: ['Date', 'Property type', 'Valid registration', 'Owner', 'Owner address'],
+    dateField: 'completion_date',
+    domId: 'vacant-property-registry',
+    layerName: 'Vacant_Properties',
     summarizeFeatures: (features) => features
   },
   {
@@ -98,7 +111,6 @@ const parcelLayers = [
     attributes: ['Description_of_Work', 'Permit_Type'],
     attributesNames: ['Date', 'Description', 'Category'],
     dateField: 'Issue_Date',
-    dateFieldmmddYYYY: false,
     domId: 'permits',
     layerName: 'Permit_Requests',
     summarizeFeatures: (features) => features
@@ -107,7 +119,8 @@ const parcelLayers = [
 
 document.getElementById('form').addEventListener('submit', (e) => {
   e.preventDefault();
-  ['info', 'codes', 'permits'].forEach(id => document.getElementById(id).innerHTML = '');
+  ['info', 'rental-registry', 'vacant-property-registry', 'codes', 'permits']
+    .forEach(id => document.getElementById(id).innerHTML = '');
 
   let query = "AND (MUNI = 'SYRACUSE')";
   const inputTaxId = document.getElementById('inputTaxId').value;
@@ -210,7 +223,14 @@ const getAndDisplayAddressFeatures = (address) => {
       .then(features => features.map(f => f.map(attr => `<td>${attr instanceof Date ? attr.toLocaleDateString() : attr}</td>`)))
       .then(features => parcelLayer.summarizeFeatures(features))
       .then(features => {
-        const convertedFeatures = features.map(f => `<tr class="table-${(f[1].includes('Open') || f[2].includes('No')) ? 'warning' : 'success'}">${f.join('\n')}</tr>`);
+        const convertedFeatures = features.map((f) => {
+          let rowColor = 'success';
+          if (f[1].includes('Open') || f[2].includes('No') || parcelLayer.layerName === 'Vacant_Properties') {
+            rowColor = 'warning';
+          }
+
+          return `<tr class="table-${rowColor}">${f.join('\n')}</tr>`;
+        });
 
         const tableEl = document.getElementById(parcelLayer.domId);
         tableEl.innerHTML = `
