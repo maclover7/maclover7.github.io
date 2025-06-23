@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<head>
+  <title>cnypower</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body class="container">
+  <h1>cnypower</h1>
+
+  <h3>National Grid (>1% out)</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Location</th>
+        <th>Out</th>
+        <th>Total</th>
+        <th>% out</th>
+      </tr>
+    </thead>
+    <tbody id="outages-ng"></tbody>
+  </table>
+
+  <h3>NYSEG (>1% out)</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Location</th>
+        <th>Out</th>
+        <th>Total</th>
+        <th>% out</th>
+      </tr>
+    </thead>
+    <tbody id="outages-nyseg"></tbody>
+  </table>
+
+  <div style="display: none;" id="data-nyseg"></div>
+
+  <script>
+    const getNG = () => {
+      fetch(
+        `https://kubra.io/stormcenter/api/v1/stormcenters/9cb2e5b7-d321-4575-a552-4ae7078cbc31/views/1b69b604-7588-4753-8591-9f135a962a2f/currentState`
+      )
+      .then(r => r.json())
+      .then(r => fetch(
+        `https://kubra.io/${r.data.interval_generation_data}/public/reports/06c8ed31-48c2-4104-a9a2-41f844152ae3_report.json`
+      ))
+      .then(r => r.json())
+      .then(r => r.file_data.areas)
+      .then(counties => [
+        ...counties,
+        ...counties.find(c => c.areaId === 'NY|Onondaga|county').areas
+      ].flat())
+      .then(areas => areas.filter(a => a.percent_cust_a.val > 1))
+      .then(areas => areas.map(a => [
+        a.areaId.includes('NY|Onondaga|NY|') ? `ONONDAGA >> ${a.name.toUpperCase()}` : `${a.name.toUpperCase()} COUNTY`,
+        a.cust_a.val.toLocaleString(),
+        a.cust_s.toLocaleString(),
+        `${a.percent_cust_a.val}%`
+      ]))
+      .then((areas) => {
+        document.getElementById('outages-ng').innerHTML = areas
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map((areaAttrs) => {
+            const attrs = areaAttrs.map(a => `<td>${a}</td>`).join('');
+            return `<tr>${attrs}</tr>`;
+          }).join('');
+      });
+    };
+
+    const getNYSEG = () => {
+      fetch('https://ebiz1.nyseg.com/OutageReports/NYSEG')
+      .then(r => r.text())
+      .then((r) => {
+        document.getElementById('data-nyseg').innerHTML = r;
+      })
+  // .then(r => {
+  //   let counties = r('table tr').toArray().slice(1, -1).map((county) => {
+  //     const result = [
+  //       r(r(county).children()[0]).text(),
+  //       Number(r(r(county).children()[2]).text().replace(',', '')),
+  //       Number(r(r(county).children()[1]).text().replace(',', ''))
+  //     ];
+
+  //     const pct = (100 * result[1] / result[2]).toFixed(2);
+  //     if (pct > 5) {
+  //       result.push(`${pct}%`);
+  //       return result;
+  //     } else {
+  //       return null;
+  //     }
+  //   });
+
+  //   counties = counties.filter((c) => c);
+  // });
+    };
+
+    getNG();
+    getNYSEG();
+  </script>
+</body>
