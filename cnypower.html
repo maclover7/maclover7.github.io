@@ -7,7 +7,7 @@
 <body class="container">
   <h1>cnypower</h1>
 
-  <h3>National Grid (>1% out)</h3>
+  <h3>National Grid (>1% out <span id="time-ng"></span>)</h3>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -41,6 +41,10 @@
         `https://kubra.io/stormcenter/api/v1/stormcenters/9cb2e5b7-d321-4575-a552-4ae7078cbc31/views/1b69b604-7588-4753-8591-9f135a962a2f/currentState`
       )
       .then(r => r.json())
+      .then(r => {
+        document.getElementById('time-ng').innerHTML = `... as of ${new Date(r.updatedAt).toLocaleTimeString()}`;
+        return Promise.resolve(r);
+      })
       .then(r => fetch(
         `https://kubra.io/${r.data.interval_generation_data}/public/reports/06c8ed31-48c2-4104-a9a2-41f844152ae3_report.json`
       ))
