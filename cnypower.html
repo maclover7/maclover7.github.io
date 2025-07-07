@@ -21,7 +21,7 @@
     <tbody id="outages-ng"></tbody>
   </table>
 
-  <h3>NYSEG (>1% out)</h3>
+  <h3>NYSEG (>1% out <span id="time-nyseg"></span>)</h3>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -74,30 +74,20 @@
     };
 
     const getNYSEG = () => {
-      fetch('https://ebiz1.nyseg.com/OutageReports/NYSEG')
+      fetch('https://raw.githubusercontent.com/maclover7/specialklax/refs/heads/main/outages-electric-nyseg.csv')
       .then(r => r.text())
       .then((r) => {
-        document.getElementById('data-nyseg').innerHTML = r;
-      })
-  // .then(r => {
-  //   let counties = r('table tr').toArray().slice(1, -1).map((county) => {
-  //     const result = [
-  //       r(r(county).children()[0]).text(),
-  //       Number(r(r(county).children()[2]).text().replace(',', '')),
-  //       Number(r(r(county).children()[1]).text().replace(',', ''))
-  //     ];
-
-  //     const pct = (100 * result[1] / result[2]).toFixed(2);
-  //     if (pct > 5) {
-  //       result.push(`${pct}%`);
-  //       return result;
-  //     } else {
-  //       return null;
-  //     }
-  //   });
-
-  //   counties = counties.filter((c) => c);
-  // });
+        const rows = r.split("\n");
+        document.getElementById('time-nyseg').innerHTML = `... as of ${rows[0].split('Updated ::: ')[1]}`;
+  
+        const counties = rows.slice(1).map((row) => row.split(' | '));
+        document.getElementById('outages-nyseg').innerHTML = counties
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map((areaAttrs) => {
+            const attrs = areaAttrs.map(a => `<td>${a}</td>`).join('');
+            return `<tr>${attrs}</tr>`;
+          }).join('');
+      });
     };
 
     getNG();
