@@ -77,7 +77,7 @@
       fetch('https://raw.githubusercontent.com/maclover7/specialklax/refs/heads/main/outages-electric-nyseg.csv')
       .then(r => r.text())
       .then((r) => {
-        const rows = r.split("\n");
+        const rows = r.trim().split("\n");
         document.getElementById('time-nyseg').innerHTML = `... as of ${rows[0].split('Updated ::: ')[1]}`;
   
         const counties = rows.slice(1).map((row) => row.split(' | '));
