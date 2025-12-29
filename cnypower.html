@@ -75,6 +75,10 @@
         ...counties.find(c => c.areaId === 'NY|Onondaga|county').areas
       ].flat())
       .then(areas => areas.filter(a => a.percent_cust_a.val > 1))
+      .then(areas => areas.filter((a) => {
+        return a.areaId.includes('NY|Onondaga|NY|') ||
+          ['Madison', 'Oneida', 'Onondaga', 'Oswego'].includes(a.name);
+      }))
       .then(areas => areas.map(a => [
         a.areaId.includes('NY|Onondaga|NY|') ? `ONONDAGA >> ${a.name.toUpperCase()}` : `${a.name.toUpperCase()} COUNTY`,
         a.cust_a.val.toLocaleString(),
