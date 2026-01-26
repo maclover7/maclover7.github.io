@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<head>
+  <title>cnypower</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+</head>
+<body class="container">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" target="_blank" href="https://jonathanmoss.me/syrchecker">syrchecker</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" target="_blank" href="https://jonathanmoss.me/cnypower">cnypower</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" target="_blank" href="https://jonathanmoss.me/syrplow">syrplow</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <h1>syrplow</h1>
+  <br>
+
+  <h3>City snow plow summary (as of <span id="time"></span>)</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Time since last plowed</th>
+        <th>Number of blocks</th>
+        <th>Percentage</th>
+        <th>Total percentage</th>
+      </tr>
+    </thead>
+    <tbody id="plow-times"></tbody>
+  </table>
+
+  <script>
+    const getPlows = () => {
+      const baseUrl = 'https://services6.arcgis.com/bdPqSfflsdgFRVVM/arcgis/rest/services/Winter_Operations_Snow_Routes/FeatureServer/0/query?where=1%3D1&outFields=*&f=json';
+
+      Promise.all([
+        fetch(`${baseUrl}&resultRecordCount=2000&resultOffset=0`).then((r) => r.json()),
+        fetch(`${baseUrl}&resultRecordCount=2000&resultOffset=2000`).then((r) => r.json()),
+        fetch(`${baseUrl}&resultRecordCount=2000&resultOffset=4000`).then((r) => r.json())
+      ])
+      .then((responses) => {
+        const plowTimes = responses.map(r => r.features.map(f => new Date(f.attributes.lastserviced))).flat();
+
+        const now = new Date();
+        document.getElementById('time').innerHTML = now.toLocaleString();
+
+        let plowTimePeriods = [
+          {
+            name: '0-1',
+            count: 0,
+            pct: 0,
+            filter: (time) => time > new Date(now - 60 * 60 * 1000)
+          },
+          {
+            name: '1-3',
+            count: 0,
+            pct: 0,
+            filter: (time) => time < new Date(now - 60 * 60 * 1000) &&
+              time > new Date(now - 60 * 60 * 3 * 1000)
+          },
+          {
+            name: '3-6',
+            count: 0,
+            pct: 0,
+            filter: (time) => time < new Date(now - 60 * 60 * 3 * 1000) &&
+              time > new Date(now - 60 * 60 * 6 * 1000)
+          },
+          {
+            name: '6-24',
+            count: 0,
+            pct: 0,
+            filter: (time) => time < new Date(now - 60 * 60 * 6 * 1000) &&
+              time > new Date(now - 60 * 60 * 24 * 1000)
+          },
+          {
+            name: '24+',
+            count: 0,
+            pct: 0,
+            filter: (time) => time < new Date(now - 60 * 60 * 24 * 1000)
+          }
+        ];
+
+        plowTimePeriods = plowTimePeriods.map((plowTimePeriod) => {
+          const matchingPlowTimes = plowTimes.filter(plowTimePeriod.filter);
+          return {
+            ...plowTimePeriod,
+            count: matchingPlowTimes.length,
+            pct: (100 * matchingPlowTimes.length / plowTimes.length)
+          };
+        });
+
+        const plowTimePeriodsHtml = plowTimePeriods.map((plowTimePeriod, index) => {
+          const previousPct = plowTimePeriods.slice(0, index).reduce((a, b) => a + b.pct, 0);
+
+          return `
+            <tr>
+              <td>${plowTimePeriod.name} hours ago</td>
+              <td>${plowTimePeriod.count.toLocaleString()}</td>
+              <td>${plowTimePeriod.pct.toFixed(2)}%</td>
+              <td>${(plowTimePeriod.pct + previousPct).toFixed(2)}%</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById('plow-times').innerHTML = plowTimePeriodsHtml.join('');
+      });
+    };
+
+    getPlows();
+  </script>
+</body>
