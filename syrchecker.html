@@ -207,7 +207,7 @@ const displayParcel = (feature, sharedOwnerParcels) => {
 };
 
 const getParcelByQuery = (parcelQuery) => {
-  const url = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Layers_2022/MapServer/7/query';
+  const url = 'https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Onondaga_Service/MapServer/7/query';
   return fetch(`${url}?f=json&where=${encodeURIComponent(parcelQuery)}&outFields=*`, { signal: AbortSignal.timeout(5000) })
     .then(res => res.json())
     .then(res => res.features);
