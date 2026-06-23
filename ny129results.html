@@ -20,8 +20,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr id="Syracuse (15th district)">
-        <td><b>Syracuse (15th district)</b></td>
+      <tr id="Syracuse (15th district overlap)">
+        <td><b>Syracuse (15th district overlap)</b></td>
       </tr>
       <tr id="Syracuse (N 690, E 81)">
         <td><b>Syracuse (N 690, E 81)</b></td>
@@ -89,7 +89,7 @@
         const ny129precincts = resultsny129ge.map(p => p['name']);
 
         if (onon15districts.includes(name)) {
-          return 'Syracuse (15th district)';
+          return 'Syracuse (15th district overlap)';
         } else if (isNorthOf690AndEastOf81(name)) {
           return 'Syracuse (N 690, E 81)';
         } else if (ny129precincts.includes(name) && name.startsWith('Syracuse ')) {
@@ -185,7 +185,7 @@
 
     $(document).ready(() => {
       const precinctGroups = {
-        'Syracuse (15th district)': 19,
+        'Syracuse (15th district overlap)': 19,
         'Syracuse (N 690, E 81)': 42,
         'Syracuse (West Side + leftover East Side)': 29,
         'Geddes (including all of Solvay)': 22,
