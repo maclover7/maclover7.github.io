@@ -13,8 +13,8 @@
     <thead>
       <tr>
         <th></th>
-        <th>Klee Hood</th>
-        <th>Mannion</th>
+        <th>Magnarelli</th>
+        <th>Brown</th>
         <th>Other</th>
         <th># of precincts</th>
       </tr>
@@ -164,7 +164,7 @@
         .then(r => r.json())
         .then(r => Promise.resolve(r.groups))
         .then((groups) => Promise.all(
-          groups.map((group) =>
+          [groups[1], groups[2]].map((group) =>
             fetch(`https://ongov.resultscaster.com/api/Resultscasts/${slug}/pdresults/${group}`)
               .then(r => r.json())
             .then(r => r.contests.find(c => c.key === contestId).pds)))
@@ -216,8 +216,8 @@
 
           const candidateTotals = groupBy(sortedResults.map(sr => sr.candidates).flat(), (c) => c.name);
           const candidateVoteTotal = Object.values(candidateTotals).flat().reduce((acc, val) => acc + val.votes, 0);
-          const candidateOneVoteTotal = candidateTotals['Sarah Klee Hood (DEM)'].flat().reduce((acc, val) => acc + val.votes, 0);
-          const candidateTwoVoteTotal = candidateTotals['John W. Mannion (DEM)'].flat().reduce((acc, val) => acc + val.votes, 0);
+          const candidateOneVoteTotal = candidateTotals['William B. Magnarelli (DEM)'].flat().reduce((acc, val) => acc + val.votes, 0);
+          const candidateTwoVoteTotal = candidateTotals['Maurice Mo Brown (DEM)'].flat().reduce((acc, val) => acc + val.votes, 0);
           const candidateThreeVoteTotal = candidateTotals['Write-in'].flat().reduce((acc, val) => acc + val.votes, 0);
 
           $(`tr[id='Total']`).html(`
