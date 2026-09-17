@@ -66,19 +66,32 @@
             Promise.resolve(contestsResults.filter(r => r.name.includes('County Legislator '))));
       };
 
-      const getContestIds = () => {
+      const getContestsWithIds = () => {
         return fetch(`https://ongov.resultscaster.com/api/resultscasts/GE25-Official/shell`)
           .then(r => r.json())
           .then(r => Promise.resolve(r.contests.filter(c => c.title.includes('County Legislator '))))
-          .then(contests => Promise.resolve(contests.map(c => c.contestAltTallyKey)));
+          .then(contests => Promise.resolve(contests.map(c => [ c.title, c.contestAltTallyKey ])));
+      };
+
+      const getSameDayPrecinctsWithStatus = () => {
+        return fetch('https://ongov.resultscaster.com/api/Resultscasts/GE25-Official/pdresults/In Person')
+          .then(r => r.json())
+          .then(r => r.contests);
       };
 
       const getSameDayPrecinctStatusesByContests = () => {
-        return getContestIds()
-          .then((contestIds) => {
-            return fetch(`https://ongov.resultscaster.com/api/resultscasts/GE25-Official/results/In Person`)
-              .then(r => r.json())
-              .then(r => Promise.resolve(r.election.contests.filter(c => contestIds.includes(c.key))));
+        return Promise.all([ getContestsWithIds(), getSameDayPrecinctsWithStatus() ])
+          .then(([ contestsWithIds, sameDayPrecinctStatusesByContests ]) => {
+            return contestsWithIds.map(([ contestName, contestId ]) => {
+              const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c.key === contestId).pds;
+
+              return [
+                contestName,
+                contestId,
+                contestPrecincts.filter(p => p.status === 2).length,
+                contestPrecincts.length
+              ];
+            });
           });
       };
 
@@ -92,17 +105,19 @@
           $('td#tonight-dem').text(demLeadingCount);
           $('td#tonight-rep').text(17 - demLeadingCount);
 
-          contestResults.forEach((result, index) => {
+          for (var result of contestResults) {
             const districtNumber = result.name.match(/County Legislator (\d+)\w+ District \(Vote for 1\)/)[1];
 
             const resultCandidatesHTML = result.candidates.map(candidate =>
               `<li class="list-group-item">${candidate[0]}; ${candidate[1].toLocaleString()}; ${candidate[2]}%</li>`);
 
+            const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c[0] === result.name.split(' (')[0]);
+
             const resultHTML = `
               <div class="col-md-4">
                 <div class="card">
                   <div class="card-header">
-                    <b>District ${districtNumber} (${1}/${1} precincts)</b>
+                    <b>District ${districtNumber} (${contestPrecincts[2]}/${contestPrecincts[3]} precincts)</b>
                   </div>
                   <ul class="list-group list-group-flush">
                     ${resultCandidatesHTML.join('\n')}
@@ -111,12 +126,12 @@
               </div>
             `;
 
-            if (index % 3 === 0) {
+            if (contestResults.indexOf(result) % 3 === 0) {
               $('body.container').append(`<div class="row mb-4"></div>`);
             }
 
             $('div.row').last().append(resultHTML);
-          });
+          }
         });
     });
   </script>
