@@ -20,23 +20,23 @@
       </tr>
     </thead>
     <tbody>
-      <tr id="Syracuse (15th district overlap)">
-        <td><b>Syracuse (15th district overlap)</b></td>
+      <tr id="Syracuse -- 15th legislative district overlap">
+        <td><b>Syracuse -- 15th legislative district overlap</b></td>
       </tr>
-      <tr id="Syracuse (N 690, E 81)">
-        <td><b>Syracuse (N 690, E 81)</b></td>
+      <tr id="Syracuse -- North and East sides">
+        <td><b>Syracuse -- North and East sides</b></td>
       </tr>
-      <tr id="Syracuse (West Side)">
-        <td><b>Syracuse (West Side)</b></td>
+      <tr id="Syracuse -- West Side">
+        <td><b>Syracuse -- West Side</b></td>
       </tr>
-      <tr id="Syracuse (leftover East Side)">
-        <td><b>Syracuse (leftover East Side)</b></td>
+      <tr id="Syracuse -- East Side">
+        <td><b>Syracuse -- East Side</b></td>
       </tr>
-      <tr id="Geddes (including all of Solvay)">
+      <tr id="Town of Geddes">
         <td><b>Geddes (including all of Solvay)</b></td>
       </tr>
-      <tr id="Van Buren (including southern Baldwinsville)">
-        <td><b>Van Buren (including southern Baldwinsville)</b></td>
+      <tr id="Town of Van Buren">
+        <td><b>Town of Van Buren</b></td>
       </tr>
       <tr id="Total">
         <td><b><i>Total</i></b></td>
@@ -96,17 +96,17 @@
         const ny129precincts = resultsny129ge.map(p => p['name']);
 
         if (onon15districts.includes(name)) {
-          return 'Syracuse (15th district overlap)';
+          return 'Syracuse -- 15th legislative district overlap';
         } else if (isNorthOf690AndEastOf81(name)) {
-          return 'Syracuse (N 690, E 81)';
+          return 'Syracuse -- North and East sides';
         } else if (leftovereastsidedistricts.includes(name)) {
-          return 'Syracuse (leftover East Side)';
+          return 'Syracuse -- East Side';
         } else if (ny129precincts.includes(name) && name.startsWith('Syracuse ')) {
-          return 'Syracuse (West Side)';
+          return 'Syracuse -- West Side';
         } else if (name.startsWith('Geddes')) {
-          return 'Geddes (including all of Solvay)';
+          return 'Town of Geddes';
         } else if (name.startsWith('Van Buren')) {
-          return 'Van Buren (including southern Baldwinsville)';
+          return 'Town of Van Buren';
         } else {
           return 'exclude';
         }
@@ -195,17 +195,22 @@
 
     $(document).ready(() => {
       const precinctGroups = {
-        'Syracuse (15th district overlap)': 19,
-        'Syracuse (N 690, E 81)': 45,
-        'Syracuse (West Side)': 16,
-        'Syracuse (leftover East Side)': 10,
-        'Geddes (including all of Solvay)': 22,
-        'Van Buren (including southern Baldwinsville)': 11
+        'Syracuse -- 15th legislative district overlap': 19,
+        'Syracuse -- North and East sides': 45,
+        'Syracuse -- West Side': 16,
+        'Syracuse -- East Side': 10,
+        'Town of Geddes': 22,
+        'Town of Van Buren': 11
       };
 
       getResults()
         .then((sortedResults) => {
           sortedResults.forEach((sortedResultGroup) => {
+            const candidateSummaryCsv = sortedResultGroup.candidates.map(c => [c.votes, c.pct]).flat();
+            console.log(`
+              ${sortedResultGroup.name},${candidateSummaryCsv.join(',')}
+            `);
+
             const $html = `
             <td><b>${sortedResultGroup.name}</b></td>
             <td>${sortedResultGroup.candidates[0].votes.toLocaleString()} (${sortedResultGroup.candidates[0].pct}%)</td>
