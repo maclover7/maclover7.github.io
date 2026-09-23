@@ -25,24 +25,25 @@
 
   <script>
   // ** CHANGE THIS ** //
-  const raceDate = '2026-06-23'; //''2024-11-05'; 2023-05-16';
+  const raceDate = '2024-11-05'; // '2026-06-23'; // '2024-11-05'; '2023-05-16';
   const raceConfigs = [
-    { id: 'NY-D-SH-129-2026-06-23', name: 'Mag/Brown' },
-    // { id: 'NY-I-83165-NY-2024-11-05', name: 'Prop One' },
-    // { id: 'NY-G-S-2024-11-05', name: 'Gillibrand' },
-    // { id: 'NY-G-H-22-2024-11-05', name: 'Mannion/Williams' },
-    // { id: 'NY-G-H-24-2024-11-05', name: 'Tenney' },
-    // { id: 'NY-G-SS-48-2024-11-05', name: 'May/Slater' },
-    // { id: 'NY-G-SS-50-2024-11-05', name: 'Ryan/Paro' },
-    // { id: 'NY-G-SH-126-2024-11-05', name: 'Lemondes/Phillips' },
-    // { id: 'NY-G-SH-127-2024-11-05', name: 'Stirpe/Kelly' },
-    // { id: 'NY-G-SH-128-2024-11-05', name: 'Hunter/Ciciarelli' },
-    // { id: 'NY-G-SH-129-2024-11-05', name: 'Magnarelli' },
+    // { id: 'NY-G-G-2024-11-05', name: 'Hochul/Blakeman' },
+    // { id: 'NY-G-C-2024-11-05', name: 'DiNapoli' },
+    // { id: 'NY-G-AG-2024-11-05', name: 'James' },
+    { id: 'NY-G-H-21-2024-11-05', name: 'Constantino/Gendebien' },
+    { id: 'NY-G-H-22-2024-11-05', name: 'Mannion/Buller' },
+    { id: 'NY-G-H-24-2024-11-05', name: 'Tenney/Ellman' },
+    { id: 'NY-G-SS-48-2024-11-05', name: 'May/McCarron' },
+    { id: 'NY-G-SS-50-2024-11-05', name: 'Ryan/Corl' },
+    { id: 'NY-G-SH-126-2024-11-05', name: 'Lemondes/Phillips' },
+    { id: 'NY-G-SH-127-2024-11-05', name: 'Stirpe' },
+    { id: 'NY-G-SH-128-2024-11-05', name: 'Hunter' },
+    { id: 'NY-G-SH-129-2024-11-05', name: 'Brown/Fiato' },
     // 'PA-D-chief_executive-allegheny-2023-05-16'
   ];
   // ** ** //
 
-  fetch(`https://static01.nyt.com/elections-assets/pages/data/${raceDate}/results-new-york-primary.json`)
+  fetch(`https://static01.nyt.com/elections-assets/pages/data/${raceDate}/results-new-york.json`)
     .then((r) => r.json())
     .then((r) => {
       raceConfigs.forEach((raceConfig) => {
@@ -51,7 +52,7 @@
         let winnerText = '';
         if (race.outcome.won.length > 0) {
           winnerText = race.candidate_metadata[race.outcome.won[0]].last_name;
-          alert(winnerText);
+          // alert(winnerText);
         }
 
         const table = document.getElementsByTagName('tbody')[0];
