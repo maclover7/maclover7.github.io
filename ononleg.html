@@ -33,6 +33,15 @@
 
   <script>
     $(document).ready(() => {
+      const elex25Margins = {
+        'D4': 'D+12.4',
+        'D5': 'D+12.8',
+        'D6': 'D+3.8',
+        'D8': 'D+51.1',
+        'D9': 'WOR+12.3',
+        'D10': 'D+10.9'
+      };
+
       const getResults = () => {
         return fetch('https://datawrapper.dwcdn.net/7ZkLR/')
           .then(r => r.text())
@@ -53,7 +62,7 @@
               const endIndex = indicesIndex === indices.length - 1 ? lines.length : indices[indicesIndex + 1] - 1;
               const candidates = lines.slice(index + 1, endIndex).map((candidateResult) => {
                 const candidateResultParts = candidateResult.split('|');
-                return [ candidateResultParts[0], Number(candidateResultParts[1]), candidateResultParts[2] ];
+                return [ candidateResultParts[0], Number(candidateResultParts[1]), parseFloat(candidateResultParts[2]) ];
               });
 
               return {
@@ -113,6 +122,12 @@
 
             const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c[0] === result.name.split(' (')[0]);
 
+            const elex25Margin = elex25Margins[`D${districtNumber}`] || 'Uncontested';
+            const currentElexMargin = result.candidates[0][2] - result.candidates.slice(1).reduce((acc, c) => c[2] + acc, 0);
+            const currentElexMarginPrefix = currentElexMargin < 0 ? 'R' : 'D';
+
+            const currentElexMarginDetails = result.candidates.length === 2 ? 'Uncontested' : `${currentElexMarginPrefix}+${currentElexMargin.toLocaleString()}`;
+
             const resultHTML = `
               <div class="col-md-4">
                 <div class="card">
@@ -121,6 +136,7 @@
                   </div>
                   <ul class="list-group list-group-flush">
                     ${resultCandidatesHTML.join('\n')}
+                    <li class="list-group-item">(YOY change: ${elex25Margin} ... ${currentElexMarginDetails})</li>
                   </ul>
                 </div>
               </div>
