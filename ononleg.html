@@ -121,6 +121,7 @@
               `<li class="list-group-item">${candidate[0]}; ${candidate[1].toLocaleString()}; ${candidate[2]}%</li>`);
 
             const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c[0] === result.name.split(' (')[0]);
+            const headerColor = contestPrecincts[2] === contestPrecincts[4] ? 'success' : 'secondary';
 
             const elex25Margin = elex25Margins[`D${districtNumber}`] || 'Uncontested';
             const currentElexMargin = result.candidates[0][2] - result.candidates.slice(1).reduce((acc, c) => c[2] + acc, 0);
@@ -131,7 +132,7 @@
             const resultHTML = `
               <div class="col-md-4">
                 <div class="card">
-                  <div class="card-header">
+                  <div class="card-header text-bg-${headerColor}">
                     <b>District ${districtNumber} (${contestPrecincts[2]}/${contestPrecincts[3]} precincts)</b>
                   </div>
                   <ul class="list-group list-group-flush">
