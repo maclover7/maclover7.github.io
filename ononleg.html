@@ -42,8 +42,11 @@
         'D10': 'D+10.9'
       };
 
+      const dwChartId = '7ZkLR';
+      const electionSlug = 'GE25-Official';
+
       const getResults = () => {
-        return fetch('https://datawrapper.dwcdn.net/7ZkLR/')
+        return fetch(`https://datawrapper.dwcdn.net/${dwChartId}/`)
           .then(r => r.text())
           .then((r) => {
             const currentVersionUrl = r.match(/<meta http-equiv="REFRESH" content="0; url=(.*)"/)[1];
@@ -76,14 +79,14 @@
       };
 
       const getContestsWithIds = () => {
-        return fetch(`https://ongov.resultscaster.com/api/resultscasts/GE25-Official/shell`)
+        return fetch(`https://ongov.resultscaster.com/api/resultscasts/${electionSlug}/shell`)
           .then(r => r.json())
           .then(r => Promise.resolve(r.contests.filter(c => c.title.includes('County Legislator '))))
           .then(contests => Promise.resolve(contests.map(c => [ c.title, c.contestAltTallyKey ])));
       };
 
       const getSameDayPrecinctsWithStatus = () => {
-        return fetch('https://ongov.resultscaster.com/api/Resultscasts/GE25-Official/pdresults/In Person')
+        return fetch(`https://ongov.resultscaster.com/api/Resultscasts/${electionSlug}/pdresults/In Person`)
           .then(r => r.json())
           .then(r => r.contests);
       };
@@ -121,7 +124,7 @@
               `<li class="list-group-item">${candidate[0]}; ${candidate[1].toLocaleString()}; ${candidate[2]}%</li>`);
 
             const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c[0] === result.name.split(' (')[0]);
-            const headerColor = contestPrecincts[2] === contestPrecincts[4] ? 'success' : 'secondary';
+            const headerColor = contestPrecincts[2] === contestPrecincts[3] ? 'success' : 'secondary';
 
             const elex25Margin = elex25Margins[`D${districtNumber}`] || 'Uncontested';
             const currentElexMargin = result.candidates[0][2] - result.candidates.slice(1).reduce((acc, c) => c[2] + acc, 0);
