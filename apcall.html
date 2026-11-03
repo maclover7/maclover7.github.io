@@ -24,11 +24,11 @@
 
   <script>
   // ** CHANGE THIS ** //
-  const raceDate = '2022-11-08'; // '2026-06-23'; // '2024-11-05'; '2023-05-16';
+  const raceDate = '2026-11-03'; // '2026-06-23'; // '2024-11-05'; '2023-05-16';
   const raceConfigs = [
     { id: 'NY-G-G', name: 'Hochul/Blakeman' },
-    { id: 'NY-G-comptroller', name: 'DiNapoli' },
-    { id: 'NY-G-attorney_general', name: 'James' },
+    { id: 'NY-G-COMP', name: 'DiNapoli' },
+    { id: 'NY-G-AG', name: 'James' },
     { id: 'NY-G-H-21', name: 'Constantino/Gendebien' },
     { id: 'NY-G-H-22', name: 'Mannion/Buller' },
     { id: 'NY-G-H-24', name: 'Tenney/Ellman' },
@@ -42,8 +42,8 @@
   ];
   // ** ** //
 
-  fetch(`https://static01.nyt.com/elections-assets/2022/data/${raceDate}/results-new-york.json`)
-  // fetch(`https://static01.nyt.com/elections-assets/pages/data/${raceDate}/results-new-york.json`)
+  // fetch(`https://static01.nyt.com/elections-assets/2022/data/${raceDate}/results-new-york.json`)
+  fetch(`https://static01.nyt.com/elections-assets/pages/data/${raceDate}/results-new-york.json`)
     .then((r) => r.json())
     .then((r) => {
       raceConfigs.forEach((raceConfig) => {
