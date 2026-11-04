@@ -86,7 +86,7 @@
       };
 
       const getSameDayPrecinctsWithStatus = () => {
-        return fetch(`https://ongov.resultscaster.com/api/Resultscasts/${electionSlug}/pdresults/In Person`)
+        return fetch(`https://ongov.resultscaster.com/api/Resultscasts/${electionSlug}/pdresults/Election Day`)
           .then(r => r.json())
           .then(r => r.contests);
       };
