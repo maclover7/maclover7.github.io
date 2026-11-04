@@ -118,13 +118,16 @@
           $('td#tonight-rep').text(17 - demLeadingCount);
 
           for (var result of contestResults) {
+            console.log(result.name);
+            console.log(result.name.match(/County Legislator (\d+)\w+ District/))
             const districtNumber = result.name.match(/County Legislator (\d+)\w+ District/)[1];
 
             const resultCandidatesHTML = result.candidates.map(candidate =>
               `<li class="list-group-item">${candidate[0]}; ${candidate[1].toLocaleString()}; ${candidate[2]}%</li>`);
 
-            const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c[0] === result.name.split(' (')[0]);
-            const headerColor = contestPrecincts[2] === contestPrecincts[3] ? 'success' : 'secondary';
+            // const contestPrecincts = sameDayPrecinctStatusesByContests.find(c => c[0] === result.name.split(' (')[0]);
+            // debugger;
+            const headerColor = 'secondary'; // contestPrecincts[2] === contestPrecincts[3] ? 'success' : 'secondary';
 
             const elex25Margin = elex25Margins[`D${districtNumber}`] || 'Uncontested';
             const currentElexMargin = result.candidates[0][2] - result.candidates.slice(1).reduce((acc, c) => c[2] + acc, 0);
@@ -136,7 +139,7 @@
               <div class="col-md-4">
                 <div class="card">
                   <div class="card-header text-bg-${headerColor}">
-                    <b>District ${districtNumber} (${contestPrecincts[2]}/${contestPrecincts[3]} precincts)</b>
+                    <b>District ${districtNumber}</b>
                   </div>
                   <ul class="list-group list-group-flush">
                     ${resultCandidatesHTML.join('\n')}
