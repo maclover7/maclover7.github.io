@@ -112,8 +112,8 @@
 
     const getAndAddElectionShapes = (electionSlug) => {
       return Promise.all([
-        getElectionShapes('PR26'),
-        getElectionReporting('PR26')
+        getElectionShapes('GE26'),
+        getElectionReporting('GE26')
       ])
         .then(mergeElectionShapesAndReporting)
         .then((features) => {
