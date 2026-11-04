@@ -118,7 +118,7 @@
           $('td#tonight-rep').text(17 - demLeadingCount);
 
           for (var result of contestResults) {
-            const districtNumber = result.name.match(/County Legislator (\d+)\w+ District \(Vote for 1\)/)[1];
+            const districtNumber = result.name.match(/County Legislator (\d+)\w+ District/)[1];
 
             const resultCandidatesHTML = result.candidates.map(candidate =>
               `<li class="list-group-item">${candidate[0]}; ${candidate[1].toLocaleString()}; ${candidate[2]}%</li>`);
